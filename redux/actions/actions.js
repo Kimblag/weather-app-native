@@ -1,16 +1,15 @@
 import axios from "axios";
-import { GET_WEATHER, SET_ERROR } from "../types";
-import config from '../../config'
+import { GET_WEATHER, SET_ERROR, SET_LOADING } from "../types";
+import config from "../../config";
 
 export const getWeather = (city, onSuccess = () => {}, onError = () => {}) => {
-  console.log(city)
+  console.log(city);
   return async (dispatch) => {
     try {
       const response = await axios.get(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${config.API_KEY}&units=metric`
       );
-      console.log(response.data);
-      if (response) {
+      if (!response) {
         const responseData = response.data;
         throw new Error(responseData.message);
       }
@@ -21,16 +20,26 @@ export const getWeather = (city, onSuccess = () => {}, onError = () => {}) => {
         payload: responseData,
       });
       onSuccess();
+      console.log(responseData);
     } catch (error) {
-      dispatch(setError(error.message));
+      dispatch({
+        type: SET_ERROR,
+        payload: error.message,
+      });
       onError();
     }
   };
 };
 
-export const setError = (err) => {
+export const setError = () => {
   return {
     type: SET_ERROR,
-    payload: err,
+    payload: "",
+  };
+};
+
+export const setLoading = () => {
+  return {
+    type: SET_LOADING,
   };
 };
